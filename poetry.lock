@@ -1,0 +1,40 @@
+[[package]]
+name = "neo4j"
+version = "5.13.0"
+description = "Neo4j Bolt driver for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+pytz = "*"
+
+[package.extras]
+numpy = ["numpy (>=1.7.0,<2.0.0)"]
+pandas = ["pandas (>=1.1.0,<3.0.0)", "numpy (>=1.7.0,<2.0.0)"]
+
+[[package]]
+name = "pytz"
+version = "2023.3.post1"
+description = "World timezone definitions, modern and historical"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "ruff"
+version = "0.0.291"
+description = "An extremely fast Python linter, written in Rust."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.8"
+content-hash = "96b194417748d76a47f00274adfc5f59f92fb1b6253b5544862830925d67445e"
+
+[metadata.files]
+neo4j = []
+pytz = []
+ruff = []

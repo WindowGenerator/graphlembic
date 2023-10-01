@@ -1,0 +1,3 @@
+class MigrationCtx:
+    def run_migrations(self) -> None:
+        ...
