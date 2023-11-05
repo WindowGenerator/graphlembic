@@ -31,7 +31,7 @@ def load_python_file(directory: Path, filename: Path) -> Module:
 
             if pyc_path is None:
                 raise GraphlembicImportError("Can't find Python file", path)
-            
+
             module = load_py_module(module_id, pyc_path)
     elif ext in (".pyc", ".pyo"):
         module = load_py_module(module_id, path)
@@ -49,10 +49,9 @@ def pyc_file_from_path(path: Path) -> Optional[str]:
         return candidate
 
 
-
 def load_py_module(module_id: str, path: str) -> Module:
     spec = importlib.util.spec_from_file_location(module_id, path)
     assert spec
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module) 
+    spec.loader.exec_module(module)
     return module
