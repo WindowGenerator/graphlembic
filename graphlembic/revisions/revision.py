@@ -2,12 +2,11 @@ from __future__ import annotations
 import re
 
 from typeguard import typechecked
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Optional, Dict, Iterator
 from graphlembic.errors import GraphlembicRevisionError
 
-# RevisionHash = _Alias[str]
 
 __NOT_SETTED_OBJECT = object()
 REVISION_ID_PATTERN = re.compile(r"^[a-z0-9]+$")
@@ -50,21 +49,36 @@ class Revisions:
 
 @typechecked
 @dataclass
-class RevisionInfo:
+class Default:
     message: Optional[str] = None
     description: Optional[str] = None
     cur_revision: RevisionID  # This should be provided when creating an instance
     prev_revision: Optional[RevisionID] = None
     create_date: date  # This should be provided when creating an instance
-    custom_fields: Optional[Dict[str, str]] = None
+
+@typechecked
+@dataclass
+class RevisionInfo:
+    default: Default = field(default_factory=Default)
+    custom: Dict[str, str] = field(default_factory=dict)
 
 
-class MetaRevisionInfo:
-    def __init__(self, revision_info: RevisionInfo) -> None:
+class Revision:
+    def __init__(self, revision_info: RevisionInfo, upgrade, downgrade) -> None:
         self._info = revision_info
         self._cur_revision = revision_info.cur_revision
         self._prev_revision = revision_info.prev_revision
         self._next_revision = __NOT_SETTED_OBJECT
+        self._upgrade = upgrade
+        self._downgrade = downgrade
+    
+    @property
+    def upgrade(self) -> None:
+        return self._upgrade
+    
+    @property
+    def downgrade(self) -> None:
+        return self._downgrade
 
     @property
     def info(self) -> RevisionInfo:
@@ -95,14 +109,4 @@ class MetaRevisionInfo:
 
     def __hash__(self) -> str:
         return self._cur_revision
-
-
-class Revision:
-    def __init__(
-        self, meta_revision_info: MetaRevisionInfo, upgrade, downgrade
-    ) -> None:
-        self._meta_revision_info = meta_revision_info
-
-    @property
-    def revision_info(self) -> RevisionInfo:
-        return self._meta_revision_info
+    

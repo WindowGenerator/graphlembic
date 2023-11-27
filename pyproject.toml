@@ -4,15 +4,25 @@ version = "0.1.0"
 description = "Graphlebmic is a micro-migration tool for Neo4J DB"
 authors = ["WindowGenerator <chudov42@gmail.com>"]
 license = "MIT"
+readme = "README.md"
+packages = [{ include = "graphlembic", from = "graphlembic" }]
+include = [{ path = "tests", format = "sdist" }]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 neo4j = "^5.13.0"
-typeguard = "^4.1.5"
+pydantic = "^2.4.2"
 
 [tool.poetry.dev-dependencies]
 ruff = "^0.0.291"
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+addopts = "-vv"
+testpaths = ["tests"]

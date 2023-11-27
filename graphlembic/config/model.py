@@ -1,67 +1,59 @@
-from typeguard import typechecked
-from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import Optional, List, Union, Literal
 from enum import Enum
 
+from pydantic import BaseModel, Field
 
-class LoggingLevel(Enum):
+
+class LoggingLevel(str, Enum):
     ERROR = "error"
     WARNING = "warning"
     INFO = "info"
     DEBUG = "debug"
 
+class SourceType(str, Enum):
+    PYTHON_SCRIPTS = "PythonScripts"
+    CQL_SCRIPTS = "CQLScripts"
 
-class CustomField:
+class CustomField(BaseModel):
     format: Optional[str] = None
     title: str
     default: Optional[str] = None
     required: bool = False
 
-
-@typechecked
-@dataclass
-class Info:
+class Info(BaseModel):
     order: Optional[List[str]] = None
-    custom: List[CustomField] = field(default_factory=list)
+    custom: List[CustomField] = Field(..., default_factory=list)
 
-
-@typechecked
-@dataclass
-class Aliases:
+class Aliases(BaseModel):
     downgrade: Optional[str] = None
     upgrade: Optional[str] = None
 
+class Revision(BaseModel):
+    aliases: Aliases = Field(..., default_factory=Aliases)
+    info: Info = Field(..., default_factory=Info)
 
-@typechecked
-@dataclass
-class Revision:
-    aliases: Aliases = field(default_factory=Aliases)
-    info: Info = field(default_factory=Info)
-
-
-@typechecked
-@dataclass
-class SourceInfo:
-    directory: str = "./versions"
+class PythonSourceInfo(BaseModel):
+    type: Literal["PythonSource"]
+    directory: str
 
 
-@typechecked
-@dataclass
-class Source:
-    type: str = "VersionsDirectory"
-    info: SourceInfo = field(default_factory=SourceInfo)
+class CQLSourceDirectories(BaseModel):
+    type: Literal["CQLSource"]
+    root: str
+    upgrade: str
+    downgrade: str
+
+class CQLSourceInfo(BaseModel):
+    directories: CQLSourceDirectories
 
 
-@typechecked
-@dataclass
-class Logging:
+Sources = Union[PythonSourceInfo, CQLSourceInfo]
+
+class Logging(BaseModel):
     level: LoggingLevel = LoggingLevel.INFO
     with_trace: bool = False
 
-
-@typechecked
-@dataclass
-class Configuration:
-    revision: Revision = field(default_factory=Revision)
-    source: Source = field(default_factory=Source)
-    logging: Logging = field(default_factory=Logging)
+class Configuration(BaseModel):
+    revision: Revision = Field(..., default_factory=Revision)
+    source: Sources = Field(..., discriminator="type")
+    logging: Logging = Field(..., default_factory=Logging)
